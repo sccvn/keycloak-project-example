@@ -12,11 +12,16 @@ import org.keycloak.services.resources.admin.AdminEventBuilder;
 import org.keycloak.services.resources.admin.ext.AdminRealmResourceProvider;
 import org.keycloak.services.resources.admin.ext.AdminRealmResourceProviderFactory;
 import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 @JBossLog
 public class CustomAdminResourceProvider implements AdminRealmResourceProvider {
+
+    private static final Logger logger  = LoggerFactory.getLogger(CustomAdminResourceProvider.class);
 
     public static final String ID = "custom-admin-resources";
 
@@ -53,11 +58,30 @@ public class CustomAdminResourceProvider implements AdminRealmResourceProvider {
 
         @Override
         public void init(Config.Scope config) {
+            logger.info("### Initialize custom admin resources with config: {} ,{}",
+                    config.scope("users", "provisioning").get("required-realm-role"),
+                    config.scope("users", "provisioning").get("managed-attribute-pattern")
+            );
+            // Retrieve realmRole with a default value if null
             String realmRole = config.scope("users", "provisioning").get("required-realm-role");
-            String attributePatternString = config.scope("users", "provisioning").get("managed-attribute-pattern");
+            if (realmRole == null) {
+                logger.info("required-realm-role is not defined, using default value 'default-realm-role'");
+                realmRole = "default-realm-role";
+            }
 
-            var privisioningConfig = new UserProvisioningConfig(realmRole, Pattern.compile(attributePatternString));
-            customAdminResource = new CustomAdminResourceProvider(privisioningConfig);
+            // Retrieve attributePatternString with a default value if null
+            String attributePatternString = config.scope("users", "provisioning").get("managed-attribute-pattern");
+            if (attributePatternString == null) {
+                logger.info("managed-attribute-pattern is not defined, using default value '.*'");
+                attributePatternString = ".*"; // You can use any default regex pattern that makes sense for your case
+            }
+
+            // Compile the pattern
+            Pattern attributePattern = Pattern.compile(attributePatternString);
+
+            // Create the provisioning config and initialize the custom admin resource
+            var provisioningConfig = new UserProvisioningConfig(realmRole, attributePattern);
+            customAdminResource = new CustomAdminResourceProvider(provisioningConfig);
         }
 
         @Override

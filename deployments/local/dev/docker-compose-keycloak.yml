@@ -4,7 +4,7 @@ services:
 
     build:
       context: "./keycloak"
-      dockerfile: "./Dockerfile"
+      dockerfile: "./Dockerfile" # default mgt login jmxuser:password
 
     #    user: "${USER}:${GROUP}"
     env_file:
@@ -63,6 +63,14 @@ services:
       - ./run/keycloak/data:/opt/jboss/keycloak/standalone/data:z
       - ./run/keycloak/logs:/opt/jboss/keycloak/standalone/logs:z
       - ./run/keycloak/perf:/opt/jboss/keycloak/standalone/perf:z
+#      - ./run/keycloak/healthCheck:/opt/jboss/keycloak/standalone/healthCheck:z
 # Add third-party extensions
 #      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/jboss/keycloak/standalone/deployments/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
       - ./keycloak-ext/keycloak-home-idp-discovery-18.0.0.jar:/opt/jboss/keycloak/standalone/deployments/keycloak-home-idp-discovery.jar:z
+#    healthCheck:
+#      command: ["CMD-SHELL", "bash /run/health_check.sh"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 30s
+#      start_interval: 5s

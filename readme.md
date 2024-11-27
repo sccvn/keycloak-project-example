@@ -407,3 +407,56 @@ We use [aquasec/trivy](https://github.com/aquasecurity/trivy) to scan the genera
 ```
 java bin/scanImage.java --image-name=acme/acme-keycloak:latest
 ```
+
+## Tips work with Windows
+
+1 - When do with .sh file on docker for window will have issue by `\r` in `.sh` file, please remove it before run docker by 
+
+```sh
+sed $'s/\r$//' 0100-onstart-deploy-extensions.sh > 0100-onstart-deploy-extensions.sh
+```
+
+2 - New keycloak version don't use curl inside images , so service will be unhealthy , do your own healthcheck 
+
+2.1 - Create a new keycloak `health_check.sh` script and setup additional healthCheck for `docker-compose-keycloak.yaml`
+create a new scripts
+
+```bash
+#!/bin/bash
+exec 3<>/dev/tcp/localhost/8080
+
+echo -e "GET /auth/health/ready HTTP/1.1\nhost: localhost:8080\n" >&3
+
+timeout --preserve-status 1 cat <&3 | grep -m 1 status | grep -m 1 UP
+ERROR=$?
+
+exec 3<&-
+exec 3>&-
+
+exit $ERROR
+```
+
+Add healthcheck to docker
+
+```bash
+"healthCheck": {
+   "command": [
+       "CMD-SHELL",
+       "bash /complete/path/to/healthcheck/script"
+    ],
+    "interval": **,
+    "timeout": **,
+    "retries": **,
+    "startPeriod": **
+ }
+```
+2.2 - Alternative solution is access to container `dev-acme-keycloak-1` and change `health_check.sh` by
+
+```sh
+sed $'s/\r$//' health_check.sh > health_check_unix.sh
+rm health_check.sh
+mv health_check_unix.sh health_check.sh
+chmod +x health_check.sh
+./health_check.sh 
+```
+then restart your container by `docker restart dev-acme-keycloak-1`

@@ -54,7 +54,7 @@ public class KeycloakEnvironment {
                 break;
         }
 
-        keycloak = KeycloakTestSupport.createKeycloakContainer();
+        keycloak = KeycloakTestSupport.createKeycloakContainer("quay.io/keycloak/keycloak:25.0",null);
         keycloak.withReuse(true);
         log.info("Starting Keycloak Container");
         keycloak.start();
