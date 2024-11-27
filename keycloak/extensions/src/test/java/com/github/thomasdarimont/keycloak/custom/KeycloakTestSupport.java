@@ -49,8 +49,6 @@ public class KeycloakTestSupport {
 
         KeycloakContainer keycloakContainer;
         if (imageName != null) {
-//            keycloakContainer = new KeycloakContainer(imageName);
-//            keycloakContainer.addEnv("KC_FEATURES", "preview");
             keycloakContainer = new KeycloakContainer(imageName)
                     .withDebug()
                     .withEnv("KC_BOOTSTRAP_ADMIN_USERNAME","admin")
@@ -60,7 +58,6 @@ public class KeycloakTestSupport {
                     .withEnv("KC_FEATURES", "preview")
                     .withExposedPorts(8080,9090)
                     .withVerboseOutput();
-//                    .waitingFor(Wait.forHttp("/").forStatusCode(200));
         } else {
             // building custom Keycloak docker image with additional libraries
             String customDockerFileName = "../docker/src/main/docker/keycloakx/Dockerfile.ci.plain";
