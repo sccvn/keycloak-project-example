@@ -59,8 +59,8 @@ public class KeycloakTestSupport {
 //                    .withEnv("KC_HTTPS_CERTIFICATE_KEY_FILE", "./config/stage/dev/tls/acme.test+1-key.pem")
                     .withEnv("KC_FEATURES", "preview")
                     .withExposedPorts(8080,9090)
-                    .withVerboseOutput()
-                    .waitingFor(Wait.forHttp("/").forStatusCode(200));
+                    .withVerboseOutput();
+//                    .waitingFor(Wait.forHttp("/").forStatusCode(200));
         } else {
             // building custom Keycloak docker image with additional libraries
             String customDockerFileName = "../docker/src/main/docker/keycloakx/Dockerfile.ci.plain";
