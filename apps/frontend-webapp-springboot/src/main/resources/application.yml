@@ -18,7 +18,7 @@ spring:
       client:
         provider:
           keycloak:
-            issuerUri: https://id.acme.test:8443/auth/realms/acme-internal
+            issuerUri: http://id.acme.test:8080/auth/realms/acme-internal
             user-name-attribute: preferred_username
         registration:
           keycloak:
